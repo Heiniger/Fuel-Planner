@@ -473,7 +473,16 @@ async function refreshForecast(){
   const url=`https://api.open-meteo.com/v1/forecast?latitude=${T.lat}&longitude=${T.lon}&hourly=temperature_2m,precipitation_probability,precipitation&timezone=auto&forecast_days=7`;
   const done=msg=>{ btn.disabled=false; btn.textContent="Refresh forecast"; if(msg){ note.className="notice err"; note.textContent=msg; } };
   let mcp=null; try{ mcp=window.claude&&window.claude.use ? await window.claude.use("mcp") : null; }catch(e){}
-  if(!mcp) return done(`Live refresh works when you open this page in the Claude desktop app. Showing the forecast snapshot from ${SNAPSHOT_AT}.`);
+  const apply=data=>{
+    const h=data.hourly;
+    FORECAST[S.track]={tz:data.timezone,start:h.time[0],t:h.temperature_2m.map(Math.round),p:h.precipitation_probability,r:h.precipitation};
+    live[S.track]=new Date().toLocaleString("en-AU",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"});
+    S.day=null; done(); render();
+  };
+  if(!mcp){
+    try{ const r=await fetch(url); if(!r.ok) throw 0; return apply(await r.json()); }
+    catch(e){ return done(`Couldn't reach the forecast service. Check the internet connection. Showing the forecast snapshot from ${SNAPSHOT_AT}.`); }
+  }
   try{
     await mcp.callTool("host:claude_browser","navigate",{url});
     const res=await mcp.callTool("host:claude_browser","get_page_text",{max_chars:200000},{cache:false});
