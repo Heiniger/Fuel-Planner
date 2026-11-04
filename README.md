@@ -11,6 +11,9 @@ Open `index.html` in any browser — it's a single self-contained page.
 
 ## Windows app
 
+**Download:** [`download/FuelPlanner.exe`](download/FuelPlanner.exe) — open it on GitHub and click the download button. If Windows SmartScreen warns, choose **More info → Run anyway**.
+
+
 `app/` holds a small Go launcher that bundles the planner into a single `FuelPlanner.exe`.
 Double-clicking it opens the planner in its own Edge (or Chrome) window. Nothing to install.
 The app closes itself about 20 s after the window is closed.
